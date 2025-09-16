@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Exports\TaskExport;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TaskController extends Controller
 {
@@ -45,7 +47,7 @@ class TaskController extends Controller
         $task->title = $validated['title'];
         $task->assignee = $validated['assignee'] ?: '';
         $task->due_date = $due_date;
-        $task->time_tracked = $validated['time_tracked'] ?: 0;
+        $task->time_tracked = $validated['time_tracked'] ?? 0;
         $task->status = $validated['status'] ?: 'pending';
         $task->priority = $validated['priority'];
 
@@ -62,5 +64,9 @@ class TaskController extends Controller
                 "data" => (object)[]
             ],400);
         }
+    }
+
+    public function getTask(Request $request){
+        return Excel::download(new TaskExport, 'tasks.xlsx');
     }
 }
